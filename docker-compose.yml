@@ -5,20 +5,25 @@ services:
       - ./tmp/db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
+
   web:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0' -p 3000"
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - .:/myapp
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - db
-      - redis
+    links:
+      - 'redis'
+      
   redis:
     image: redis
     ports:
-      - 6379:6379
+      - '6379:6379'
     command: redis-server
-  elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.2.3
+    volumes:
+      - 'redis/data'
+  # elastic:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.2.3
